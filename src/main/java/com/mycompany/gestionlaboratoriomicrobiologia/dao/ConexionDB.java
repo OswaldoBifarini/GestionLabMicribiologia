@@ -7,24 +7,14 @@ package com.mycompany.gestionlaboratoriomicrobiologia.dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 
-/**
- *
- * @author DELL
- */
 public class ConexionDB {
-    private static final String URL = "jdbc:mysql://localhost:3306/lab_espoch";
-    private static final String USER = "admin";
-    private static final String PASS = "securePass123";
+    // Configuración para PostgreSQL
+    public static final String URL = "jdbc:postgresql://localhost:5432/GestionLab";
+    public static final String USER = "postgres";
+    private static final String PASS = "Pintegrador";  // Cambia por tu contraseña real
     
     public static Connection conectar() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);
-    }
-
-    public static void inicializar() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }
