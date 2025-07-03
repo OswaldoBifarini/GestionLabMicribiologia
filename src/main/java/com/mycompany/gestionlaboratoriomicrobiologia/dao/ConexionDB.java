@@ -12,7 +12,7 @@ public class ConexionDB {
     // Configuración para PostgreSQL
     public static final String URL = "jdbc:postgresql://localhost:5432/GestionLab";
     public static final String USER = "postgres";
-    private static final String PASS = "Pintegrador";  // Cambia por tu contraseña real
+    private static final String PASS = "Pintegrador";  
     
     public static Connection conectar() throws SQLException {
         return DriverManager.getConnection(URL, USER, PASS);

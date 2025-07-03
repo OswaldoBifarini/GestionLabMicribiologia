@@ -20,6 +20,10 @@ public class ControladorLogin {
         this.usuarioDAO = usuarioDAO;
     }
 
+    public ControladorLogin() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
     public Rol autenticar(String usuario, String clave) {
         String hashClave = PasswordUtil.hashPassword(clave);
         return usuarioDAO.validarCredenciales(usuario, hashClave);

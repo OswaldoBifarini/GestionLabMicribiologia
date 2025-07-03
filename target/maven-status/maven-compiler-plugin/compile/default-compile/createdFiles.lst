@@ -1,5 +1,7 @@
+com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaTecnico$1.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\persona\Persona.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\kardex\Equipo.class
+com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaTecnico.class
 com\mycompany\gestionlaboratoriomicrobiologia\controlador\ControladorPlanificacion.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\persona\Tecnico.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\kardex\TipoMaterial.class
@@ -14,10 +16,10 @@ com\mycompany\gestionlaboratoriomicrobiologia\dao\AsignaturaDAO.class
 com\mycompany\gestionlaboratoriomicrobiologia\controlador\ControladorLogin.class
 com\mycompany\gestionlaboratoriomicrobiologia\controlador\planificacion\ControladorAgendamiento.class
 com\mycompany\gestionlaboratoriomicrobiologia\GestionLaboratorioMicrobiologia.class
+com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaLogin$3.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\persona\Docente.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\planificacion\PAO.class
 com\mycompany\gestionlaboratoriomicrobiologia\util\BCrypt.class
-com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaAdmin$1.class
 com\mycompany\gestionlaboratoriomicrobiologia\controlador\planificacion\ControladorAsignatura.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\persona\Rol.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\administracion\TipoReporte.class
@@ -34,6 +36,7 @@ com\mycompany\gestionlaboratoriomicrobiologia\excepciones\RelacionException.clas
 com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaLogin.class
 com\mycompany\gestionlaboratoriomicrobiologia\excepciones\BusinessException.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\kardex\TipoReactivo.class
+com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaDocente$1.class
 com\mycompany\gestionlaboratoriomicrobiologia\controlador\seguridad\ControladorUsuario.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\planificacion\EstadoAgendamiento.class
 com\mycompany\gestionlaboratoriomicrobiologia\dao\ConexionDB.class
@@ -48,12 +51,14 @@ com\mycompany\gestionlaboratoriomicrobiologia\dao\ReactivoDAO.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\kardex\EquipoTecnologico.class
 com\mycompany\gestionlaboratoriomicrobiologia\dao\LaboratorioDAO.class
 com\mycompany\gestionlaboratoriomicrobiologia\dao\AgendamientoDAO.class
+com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaDocente.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\administracion\EstadoPedido.class
 com\mycompany\gestionlaboratoriomicrobiologia\excepciones\ConflictoHorarioException.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\administracion\Factura.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\planificacion\Laboratorio.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\planificacion\EstadoLab.class
 com\mycompany\gestionlaboratoriomicrobiologia\controlador\seguridad\ControladorUsuario$1.class
+com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaLogin$2.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\planificacion\Agendamiento.class
 com\mycompany\gestionlaboratoriomicrobiologia\util\PasswordUtil.class
 com\mycompany\gestionlaboratoriomicrobiologia\dao\AgendamientoDAOImpl.class

@@ -14,7 +14,7 @@ import java.security.SecureRandom;
  * Basado en la implementación de jBCrypt (http://www.mindrot.org/projects/jBCrypt/)
  */
 public class BCrypt {
-    // Configuración de costo (work factor)
+    // Config de costo, se implementaria si c llegara a utilizar par gestion real 
     private static final int GENSALT_DEFAULT_LOG2_ROUNDS = 10;
     private static final int BCRYPT_SALT_LEN = 16;
     
@@ -28,8 +28,8 @@ public class BCrypt {
     }
 
     public static String hashpw(String password, String salt) {
-        // Implementación simplificada para el contexto
-        return "hashed_" + password; // En una implementación real usarías algoritmos seguros
+        
+        return "hashed_" + password; 
     }
 
     public static String gensalt() {
@@ -49,11 +49,11 @@ public class BCrypt {
     }
 
     public static boolean checkpw(String plaintext, String hashed) {
-        // Implementación simplificada
+       
         return hashed.equals(hashpw(plaintext, hashed.substring(0, 29)));
     }
 
-    // Métodos auxiliares
+    // mtodos auxiliares
     private static String encodeBase64(byte[] d, int len) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < len; i += 3) {

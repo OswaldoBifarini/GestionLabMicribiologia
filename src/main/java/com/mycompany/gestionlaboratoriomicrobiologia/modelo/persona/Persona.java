@@ -16,7 +16,7 @@ public abstract class Persona {
     protected String telefono;
     protected String email;
 
-    // + Getters/Setters
+    //  Getters/Setters que llaman al los metodos
     public String getCedula() {
         return cedula;
     }
