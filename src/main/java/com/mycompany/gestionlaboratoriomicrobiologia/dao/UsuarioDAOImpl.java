@@ -38,24 +38,36 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     // Método validarCredenciales 
     @Override
     public Rol validarCredenciales(String email, String clave) {
+        String SQL_VALIDAR = "SELECT tipousuario FROM usuario WHERE email = ? AND password = ?";//NEW to solve login
         try (Connection conn = ConexionDB.conectar(); PreparedStatement stmt = conn.prepareStatement(SQL_VALIDAR)) {
 
+            // Depuraciod d proces
+            System.out.println("Email: " + email);
+            System.out.println("Clave: " + clave);
+
             stmt.setString(1, email);
-            stmt.setString(2, clave);  // Sin hashing temporal
+            stmt.setString(2, clave);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
+                    String rolStr = rs.getString("tipousuario");
+                    System.out.println("Rol desde BD: " + rolStr); // Depuración
                     return Rol.valueOf(rs.getString("tipousuario"));
+                } else {
+                    System.out.println("No se encontraron resultados"); // Depuración
                 }
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error al validar credenciales", e);
+            
         }
         return null;
     }
 
     @Override
     public Usuario insertar(Usuario usuario) {
+
+        String SQL_VALIDAR = "SELECT tipousuario FROM usuario WHERE email = ? AND password = ?";// Consulta ACTUALIZADA
         try (Connection conn = ConexionDB.conectar(); PreparedStatement stmt = conn.prepareStatement(SQL_INSERT)) {
 
             stmt.setString(1, usuario.getId());
@@ -114,8 +126,8 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     public boolean actualizarUsuario(Usuario usuario) {
         try (Connection conn = ConexionDB.conectar(); PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR)) {
 
-            stmt.setString(1, usuario.getCredencial()); 
-            stmt.setString(2, usuario.getRol().name());  
+            stmt.setString(1, usuario.getCredencial());
+            stmt.setString(2, usuario.getRol().name());
             stmt.setString(3, usuario.getId());          // email
 
             int affectedRows = stmt.executeUpdate();

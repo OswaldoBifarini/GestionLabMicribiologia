@@ -25,11 +25,22 @@ public class ControladorLogin {
     }
 
     public Rol autenticar(String email, String clave) {
-        return usuarioDAO.validarCredenciales(email, clave);
+        System.out.println("Autenticando: " + email);
+        Rol rol = usuarioDAO.validarCredenciales(email, clave);
+        System.out.println("Rol obtenido: " + rol);
+        return rol;
     }
 
-    /*public Rol autenticar(String usuario, String clave) {
+    /*
+    public Rol autenticar(String email, String clave) {
+        return usuarioDAO.validarCredenciales(email, clave);
+    }*/
+
+     /*
+    
+    public Rol autenticar(String usuario, String clave) {
         String hashClave = PasswordUtil.hashPassword(clave);
         return usuarioDAO.validarCredenciales(usuario, hashClave);
+    
     }*/
 }

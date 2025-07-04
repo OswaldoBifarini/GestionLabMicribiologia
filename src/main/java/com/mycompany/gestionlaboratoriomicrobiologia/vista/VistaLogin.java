@@ -78,6 +78,7 @@ public class VistaLogin extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(38, 70, 0, 0);
         panelPrincipal.add(jLabelContraseña, gridBagConstraints);
 
+        jTextField1.setText("admin@lab.com");
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);

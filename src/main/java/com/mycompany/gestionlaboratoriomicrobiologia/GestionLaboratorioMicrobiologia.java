@@ -7,6 +7,8 @@ import com.mycompany.gestionlaboratoriomicrobiologia.controlador.ControladorLogi
 import com.mycompany.gestionlaboratoriomicrobiologia.dao.ConexionDB;
 import com.mycompany.gestionlaboratoriomicrobiologia.dao.UsuarioDAO;
 import com.mycompany.gestionlaboratoriomicrobiologia.dao.UsuarioDAOImpl;
+import com.mycompany.gestionlaboratoriomicrobiologia.modelo.persona.Rol;
+import com.mycompany.gestionlaboratoriomicrobiologia.modelo.persona.Usuario;
 import com.mycompany.gestionlaboratoriomicrobiologia.vista.VistaLogin;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -20,6 +22,13 @@ public class GestionLaboratorioMicrobiologia {
             try {
                 // 1. Verificar conexión con PostgreSQL
                 testConexionDB();
+                
+                /*
+              
+                UsuarioDAO dao = new UsuarioDAOImpl();
+                dao.insertar(new Usuario("Admin", "Sistema", "admin@lab.com", "admin123", Rol.ADMINISTRADOR));
+                
+                */
 
                 // 2. Configurar controlador
                 UsuarioDAO usuarioDAO = new UsuarioDAOImpl();
@@ -28,7 +37,7 @@ public class GestionLaboratorioMicrobiologia {
                 // 3. Iniciar interfaz
                 VistaLogin vistaLogin = new VistaLogin(controladorLogin);
                 vistaLogin.setVisible(true);
-                
+
             } catch (SQLException e) {
                 handlePostgreSQLError(e);
             } catch (Exception e) {
@@ -66,10 +75,10 @@ public class GestionLaboratorioMicrobiologia {
 
     private static void showErrorDialog(String message) {
         JOptionPane.showMessageDialog(
-            null,
-            message,
-            "Error de Inicio - Sistema de Gestión de Laboratorio",
-            JOptionPane.ERROR_MESSAGE
+                null,
+                message,
+                "Error de Inicio - Sistema de Gestión de Laboratorio",
+                JOptionPane.ERROR_MESSAGE
         );
     }
 }
