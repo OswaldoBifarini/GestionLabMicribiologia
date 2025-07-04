@@ -57,7 +57,7 @@ public class VistaLogin extends javax.swing.JFrame {
         panelPrincipal.add(lblTitulo, gridBagConstraints);
 
         jLabelUsuario.setFont(new java.awt.Font("SansSerif", 0, 14)); // NOI18N
-        jLabelUsuario.setText("Usuario");
+        jLabelUsuario.setText("Usuario Mail");
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 1;
@@ -142,11 +142,11 @@ public class VistaLogin extends javax.swing.JFrame {
     }
 
     private void btnLoginActionPerformed(java.awt.event.ActionEvent evt) {
-        String usuario = txtUsuario.getText();
+        String email = txtUsuario.getText();
         String contrasena = new String(txtContrasena.getPassword());
 
         try {
-            Rol rol = controlador.autenticar(usuario, contrasena);
+            Rol rol = controlador.autenticar(email, contrasena);
             abrirVistaSegunRol(rol);
             this.dispose();
         } catch (Exception ex) {

@@ -19,30 +19,33 @@ import java.sql.SQLException;
 public class UsuarioDAOImpl implements UsuarioDAO {
 
     private static final String SQL_VALIDAR
-            = "SELECT rol FROM usuarios WHERE id = ? AND clave_hash = ?";
+            = "SELECT tipousuario FROM usuario WHERE email = ? AND password = ?";
 
     private static final String SQL_INSERT
-            = "INSERT INTO usuarios (id, credencial_hash, rol) VALUES (?, ?, ?)";
+            = "INSERT INTO usuario (nombre, apellido, email, password, tipousuario) "
+            + "VALUES (?, ?, ?, ?, ?)";
 
     private static final String SQL_OBTENER_ROL
-            = "SELECT rol FROM usuarios WHERE id = ?";
+            = "SELECT tipousuario FROM usuario WHERE email = ?";
 
     private static final String SQL_OBTENER_POR_ID
-            = "SELECT id, credencial_hash, rol FROM usuarios WHERE id = ?";
+            = "SELECT idusuario, nombre, apellido, email, password, tipousuario "
+            + "FROM usuario WHERE email = ?";
 
     private static final String SQL_ACTUALIZAR
-            = "UPDATE usuarios SET credencial_hash = ?, rol = ? WHERE id = ?";
+            = "UPDATE usuario SET password = ?, tipousuario = ? WHERE email = ?";
 
+    // Método validarCredenciales 
     @Override
-    public Rol validarCredenciales(String usuario, String clave) {
+    public Rol validarCredenciales(String email, String clave) {
         try (Connection conn = ConexionDB.conectar(); PreparedStatement stmt = conn.prepareStatement(SQL_VALIDAR)) {
 
-            stmt.setString(1, usuario);
-            stmt.setString(2, PasswordUtil.hashPassword(clave));
+            stmt.setString(1, email);
+            stmt.setString(2, clave);  // Sin hashing temporal
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    return Rol.valueOf(rs.getString("rol"));
+                    return Rol.valueOf(rs.getString("tipousuario"));
                 }
             }
         } catch (SQLException e) {
@@ -58,6 +61,7 @@ public class UsuarioDAOImpl implements UsuarioDAO {
             stmt.setString(1, usuario.getId());
             stmt.setString(2, PasswordUtil.hashPassword(usuario.getCredencial()));
             stmt.setString(3, usuario.getRol().name());
+            stmt.setString(4, PasswordUtil.hashPassword(usuario.getCredencial()));
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -110,6 +114,21 @@ public class UsuarioDAOImpl implements UsuarioDAO {
     public boolean actualizarUsuario(Usuario usuario) {
         try (Connection conn = ConexionDB.conectar(); PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR)) {
 
+            stmt.setString(1, usuario.getCredencial()); 
+            stmt.setString(2, usuario.getRol().name());  
+            stmt.setString(3, usuario.getId());          // email
+
+            int affectedRows = stmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            throw new RuntimeException("Error al actualizar usuario", e);
+        }
+    }
+
+    /*@Override
+    public boolean actualizarUsuario(Usuario usuario) {
+        try (Connection conn = ConexionDB.conectar(); PreparedStatement stmt = conn.prepareStatement(SQL_ACTUALIZAR)) {
+
             stmt.setString(1, PasswordUtil.hashPassword(usuario.getCredencial()));
             stmt.setString(2, usuario.getRol().name());
             stmt.setString(3, usuario.getId());
@@ -119,5 +138,5 @@ public class UsuarioDAOImpl implements UsuarioDAO {
         } catch (SQLException e) {
             throw new RuntimeException("Error al actualizar usuario", e);
         }
-    }
+    }*/
 }

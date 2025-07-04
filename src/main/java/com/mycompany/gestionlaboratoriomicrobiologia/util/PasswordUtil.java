@@ -16,4 +16,3 @@ public class PasswordUtil {
         return BCrypt.checkpw(candidato, hash);
     }
 }
-   
