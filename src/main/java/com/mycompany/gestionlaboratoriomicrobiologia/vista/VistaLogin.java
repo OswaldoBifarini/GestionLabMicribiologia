@@ -78,7 +78,6 @@ public class VistaLogin extends javax.swing.JFrame {
         gridBagConstraints.insets = new java.awt.Insets(38, 70, 0, 0);
         panelPrincipal.add(jLabelContraseña, gridBagConstraints);
 
-        jTextField1.setText("admin@lab.com");
         jTextField1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jTextField1ActionPerformed(evt);
@@ -131,7 +130,7 @@ public class VistaLogin extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(panelPrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, 299, Short.MAX_VALUE)
+                .addComponent(panelPrincipal, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
