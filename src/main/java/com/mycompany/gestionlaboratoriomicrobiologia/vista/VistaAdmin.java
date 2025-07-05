@@ -4,22 +4,43 @@
  */
 package com.mycompany.gestionlaboratoriomicrobiologia.vista;
 
+import com.mycompany.gestionlaboratoriomicrobiologia.dao.ConexionDB;
+import java.awt.BorderLayout;
+import java.awt.GridLayout;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.Vector;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
+import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
-/**
- *
- * @author DELL
- */
 public class VistaAdmin extends javax.swing.JFrame {
+    
+    private Connection conexion;
 
-
-    /**
-     * Creates new form VistaAdmin
-     */
     public VistaAdmin() {
-        initComponents();
+        try {
+            conexion = ConexionDB.conectar();
+            initComponents();
+            cargarDatosUsuarios();
+            cargarDatosLaboratorios();
+            configurarEventos();
+            configurarComboReportes();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al conectar con la base de datos: " + ex.getMessage(), 
+                "Error de conexión", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -45,6 +66,10 @@ public class VistaAdmin extends javax.swing.JFrame {
         btnCambiarEstado = new javax.swing.JButton();
         jTabbedPane4 = new javax.swing.JTabbedPane();
         panelReportes = new javax.swing.JPanel();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        comboReportes = new javax.swing.JComboBox<>();
+        btnGenerarReporte = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Panel de Administración");
@@ -132,16 +157,26 @@ public class VistaAdmin extends javax.swing.JFrame {
 
         jTabbedPane1.addTab("Laboratorios", jTabbedPane3);
 
-        javax.swing.GroupLayout panelReportesLayout = new javax.swing.GroupLayout(panelReportes);
-        panelReportes.setLayout(panelReportesLayout);
-        panelReportesLayout.setHorizontalGroup(
-            panelReportesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 457, Short.MAX_VALUE)
-        );
-        panelReportesLayout.setVerticalGroup(
-            panelReportesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 530, Short.MAX_VALUE)
-        );
+        panelReportes.setLayout(new java.awt.BorderLayout());
+
+        jPanel4.setLayout(new java.awt.GridLayout());
+
+        jLabel1.setFont(new java.awt.Font("SansSerif", 1, 14)); // NOI18N
+        jLabel1.setText("Generar Reportes");
+        jPanel4.add(jLabel1);
+
+        comboReportes.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Item 1", "Item 2", "Item 3", "Item 4" }));
+        comboReportes.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboReportesActionPerformed(evt);
+            }
+        });
+        jPanel4.add(comboReportes);
+
+        btnGenerarReporte.setText("Generar Reporte");
+        jPanel4.add(btnGenerarReporte);
+
+        panelReportes.add(jPanel4, java.awt.BorderLayout.PAGE_START);
 
         jTabbedPane4.addTab("Reportes del Sistema", panelReportes);
 
@@ -152,11 +187,457 @@ public class VistaAdmin extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void comboReportesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboReportesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_comboReportesActionPerformed
+
     /**
      * @param args the command line arguments
      */
+    
+    // CÓDIGO MANUAL AÑADIDO DESPUÉS DEL BLOQUE GENERADO POR NETBEANS
+    
+    private void configurarEventos() {
+        btnAgregarUsuario.addActionListener(e -> agregarUsuario());
+        btnEditarUsuario.addActionListener(e -> editarUsuario());
+        btnEliminarUsuario.addActionListener(e -> eliminarUsuario());
+        btnAgregarLab.addActionListener(e -> agregarLaboratorio());
+        btnEditarLab.addActionListener(e -> editarLaboratorio());
+        btnCambiarEstado.addActionListener(e -> cambiarEstadoLaboratorio());
+        btnGenerarReporte.addActionListener(e -> generarReporte());
+    }
+    
+    private void configurarComboReportes() {
+        comboReportes.removeAllItems();
+        comboReportes.addItem("Seleccione un reporte...");
+        comboReportes.addItem("Uso de laboratorios por período");
+        comboReportes.addItem("Agendamientos por docente");
+        comboReportes.addItem("Materiales próximos a caducar");
+        comboReportes.addItem("Incidencias reportadas");
+    }
+    
+    private void cargarDatosUsuarios() {
+        try {
+            String query = "SELECT idusuario, nombre, apellido, tipousuario, email, telefono FROM usuario";
+            PreparedStatement stmt = conexion.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            
+            DefaultTableModel modelo = (DefaultTableModel) tablaUsuarios.getModel();
+            modelo.setRowCount(0); // Limpiar tabla
+            
+            while (rs.next()) {
+                modelo.addRow(new Object[]{
+                    rs.getInt("idusuario"),
+                    rs.getString("nombre"),
+                    rs.getString("apellido"),
+                    rs.getString("tipousuario"),
+                    rs.getString("email"),
+                    rs.getString("telefono")
+                });
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al cargar usuarios: " + ex.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
+    private void cargarDatosLaboratorios() {
+        try {
+            String query = "SELECT idlaboratorio, descripcion as nombre, capacidad FROM laboratorio";
+            PreparedStatement stmt = conexion.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            
+            DefaultTableModel modelo = (DefaultTableModel) tablaLaboratorios.getModel();
+            modelo.setRowCount(0); // Limpiar tabla
+            
+            while (rs.next()) {
+                modelo.addRow(new Object[]{
+                    rs.getString("idlaboratorio"),
+                    rs.getString("nombre"),
+                    "Edificio X", // Valor temporal
+                    "DISPONIBLE", // Valor temporal
+                    rs.getInt("capacidad")
+                });
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al cargar laboratorios: " + ex.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private void agregarUsuario() {
+        JDialog dialog = new JDialog(this, "Nuevo Usuario", true);
+        dialog.setLayout(new GridLayout(0, 2, 10, 10));
+        dialog.setSize(400, 300);
+        
+        JTextField txtNombre = new JTextField();
+        JTextField txtApellido = new JTextField();
+        JTextField txtEmail = new JTextField();
+        JTextField txtTelefono = new JTextField();
+        JComboBox<String> comboRol = new javax.swing.JComboBox<>(new String[]{"ADMINISTRADOR", "DOCENTE", "TECNICO"});
+        JPasswordField txtPassword = new JPasswordField();
+        
+        dialog.add(new JLabel("Nombre:"));
+        dialog.add(txtNombre);
+        dialog.add(new JLabel("Apellido:"));
+        dialog.add(txtApellido);
+        dialog.add(new JLabel("Email:"));
+        dialog.add(txtEmail);
+        dialog.add(new JLabel("Teléfono:"));
+        dialog.add(txtTelefono);
+        dialog.add(new JLabel("Rol:"));
+        dialog.add(comboRol);
+        dialog.add(new JLabel("Contraseña:"));
+        dialog.add(txtPassword);
+        
+        JButton btnGuardar = new javax.swing.JButton("Guardar");
+        btnGuardar.addActionListener(e -> {
+            if (txtNombre.getText().isEmpty() || txtApellido.getText().isEmpty() || 
+                txtEmail.getText().isEmpty() || txtPassword.getPassword().length == 0) {
+                JOptionPane.showMessageDialog(dialog, "Complete todos los campos obligatorios", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            try {
+                String query = "INSERT INTO usuario (nombre, apellido, email, telefono, tipousuario, password) " +
+                               "VALUES (?, ?, ?, ?, ?, ?)";
+                PreparedStatement stmt = conexion.prepareStatement(query);
+                stmt.setString(1, txtNombre.getText());
+                stmt.setString(2, txtApellido.getText());
+                stmt.setString(3, txtEmail.getText());
+                stmt.setString(4, txtTelefono.getText());
+                stmt.setString(5, comboRol.getSelectedItem().toString());
+                stmt.setString(6, new String(txtPassword.getPassword()));
+                
+                stmt.executeUpdate();
+                cargarDatosUsuarios();
+                dialog.dispose();
+                JOptionPane.showMessageDialog(this, "Usuario registrado exitosamente");
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, "Error al guardar usuario: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        JPanel panelBotones = new JPanel();
+        panelBotones.add(btnGuardar);
+        
+        dialog.add(new JLabel()); // Espacio vacío
+        dialog.add(panelBotones);
+        dialog.setVisible(true);
+    }
 
+    private void editarUsuario() {
+        int filaSeleccionada = tablaUsuarios.getSelectedRow();
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un usuario para editar", 
+                "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int idUsuario = (int) tablaUsuarios.getValueAt(filaSeleccionada, 0);
+        
+        JDialog dialog = new JDialog(this, "Editar Usuario", true);
+        dialog.setLayout(new GridLayout(0, 2, 10, 10));
+        dialog.setSize(400, 300);
+        
+        JTextField txtNombre = new JTextField(tablaUsuarios.getValueAt(filaSeleccionada, 1).toString());
+        JTextField txtApellido = new JTextField(tablaUsuarios.getValueAt(filaSeleccionada, 2).toString());
+        JTextField txtEmail = new JTextField(tablaUsuarios.getValueAt(filaSeleccionada, 4).toString());
+        JTextField txtTelefono = new JTextField(tablaUsuarios.getValueAt(filaSeleccionada, 5).toString());
+        JComboBox<String> comboRol = new javax.swing.JComboBox<>(new String[]{"ADMINISTRADOR", "DOCENTE", "TECNICO"});
+        comboRol.setSelectedItem(tablaUsuarios.getValueAt(filaSeleccionada, 3).toString());
+        
+        dialog.add(new JLabel("Nombre:"));
+        dialog.add(txtNombre);
+        dialog.add(new JLabel("Apellido:"));
+        dialog.add(txtApellido);
+        dialog.add(new JLabel("Email:"));
+        dialog.add(txtEmail);
+        dialog.add(new JLabel("Teléfono:"));
+        dialog.add(txtTelefono);
+        dialog.add(new JLabel("Rol:"));
+        dialog.add(comboRol);
+        
+        JButton btnGuardar = new javax.swing.JButton("Guardar");
+        btnGuardar.addActionListener(e -> {
+            try {
+                String query = "UPDATE usuario SET nombre = ?, apellido = ?, email = ?, " +
+                              "telefono = ?, tipousuario = ? WHERE idusuario = ?";
+                PreparedStatement stmt = conexion.prepareStatement(query);
+                stmt.setString(1, txtNombre.getText());
+                stmt.setString(2, txtApellido.getText());
+                stmt.setString(3, txtEmail.getText());
+                stmt.setString(4, txtTelefono.getText());
+                stmt.setString(5, comboRol.getSelectedItem().toString());
+                stmt.setInt(6, idUsuario);
+                
+                stmt.executeUpdate();
+                cargarDatosUsuarios();
+                dialog.dispose();
+                JOptionPane.showMessageDialog(this, "Usuario actualizado exitosamente");
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, "Error al actualizar usuario: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        JPanel panelBotones = new JPanel();
+        panelBotones.add(btnGuardar);
+        
+        dialog.add(new JLabel()); // Espacio vacío
+        dialog.add(panelBotones);
+        dialog.setVisible(true);
+    }
+
+    private void eliminarUsuario() {
+        int filaSeleccionada = tablaUsuarios.getSelectedRow();
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un usuario para eliminar", 
+                "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        int idUsuario = (int) tablaUsuarios.getValueAt(filaSeleccionada, 0);
+        
+        int confirmacion = JOptionPane.showConfirmDialog(
+            this, 
+            "¿Está seguro de eliminar este usuario?", 
+            "Confirmar eliminación", 
+            JOptionPane.YES_NO_OPTION
+        );
+        
+        if (confirmacion == JOptionPane.YES_OPTION) {
+            try {
+                String query = "DELETE FROM usuario WHERE idusuario = ?";
+                PreparedStatement stmt = conexion.prepareStatement(query);
+                stmt.setInt(1, idUsuario);
+                stmt.executeUpdate();
+                
+                cargarDatosUsuarios();
+                JOptionPane.showMessageDialog(this, "Usuario eliminado exitosamente");
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "Error al eliminar usuario: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    private void agregarLaboratorio() {
+        JDialog dialog = new JDialog(this, "Nuevo Laboratorio", true);
+        dialog.setLayout(new GridLayout(0, 2, 10, 10));
+        dialog.setSize(400, 250);
+        
+        JTextField txtCodigo = new JTextField();
+        JTextField txtNombre = new JTextField();
+        JTextField txtCapacidad = new JTextField();
+        JComboBox<String> comboEstado = new javax.swing.JComboBox<>(new String[]{"DISPONIBLE", "OCUPADO", "MANTENIMIENTO", "INACTIVO"});
+        
+        dialog.add(new JLabel("Código:"));
+        dialog.add(txtCodigo);
+        dialog.add(new JLabel("Nombre:"));
+        dialog.add(txtNombre);
+        dialog.add(new JLabel("Capacidad:"));
+        dialog.add(txtCapacidad);
+        dialog.add(new JLabel("Estado:"));
+        dialog.add(comboEstado);
+        
+        JButton btnGuardar = new javax.swing.JButton("Guardar");
+        btnGuardar.addActionListener(e -> {
+            if (txtCodigo.getText().isEmpty() || txtNombre.getText().isEmpty() || txtCapacidad.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "Complete los campos obligatorios", 
+                    "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            try {
+                String query = "INSERT INTO laboratorio (idlaboratorio, descripcion, capacidad) VALUES (?, ?, ?)";
+                PreparedStatement stmt = conexion.prepareStatement(query);
+                stmt.setString(1, txtCodigo.getText());
+                stmt.setString(2, txtNombre.getText());
+                stmt.setInt(3, Integer.parseInt(txtCapacidad.getText()));
+                
+                stmt.executeUpdate();
+                cargarDatosLaboratorios();
+                dialog.dispose();
+                JOptionPane.showMessageDialog(this, "Laboratorio registrado exitosamente");
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, "Error al guardar laboratorio: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "La capacidad debe ser un número válido",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        JPanel panelBotones = new JPanel();
+        panelBotones.add(btnGuardar);
+        
+        dialog.add(new JLabel()); // Espacio vacío
+        dialog.add(panelBotones);
+        dialog.setVisible(true);
+    }
+
+    private void editarLaboratorio() {
+        int filaSeleccionada = tablaLaboratorios.getSelectedRow();
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un laboratorio para editar", 
+                "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String codigoLab = tablaLaboratorios.getValueAt(filaSeleccionada, 0).toString();
+        
+        JDialog dialog = new JDialog(this, "Editar Laboratorio", true);
+        dialog.setLayout(new GridLayout(0, 2, 10, 10));
+        dialog.setSize(400, 250);
+        
+        JTextField txtCodigo = new JTextField(tablaLaboratorios.getValueAt(filaSeleccionada, 0).toString());
+        txtCodigo.setEditable(false);
+        JTextField txtNombre = new JTextField(tablaLaboratorios.getValueAt(filaSeleccionada, 1).toString());
+        JTextField txtCapacidad = new JTextField(tablaLaboratorios.getValueAt(filaSeleccionada, 4).toString());
+        JComboBox<String> comboEstado = new javax.swing.JComboBox<>(new String[]{"DISPONIBLE", "OCUPADO", "MANTENIMIENTO", "INACTIVO"});
+        comboEstado.setSelectedItem(tablaLaboratorios.getValueAt(filaSeleccionada, 3).toString());
+        
+        dialog.add(new JLabel("Código:"));
+        dialog.add(txtCodigo);
+        dialog.add(new JLabel("Nombre:"));
+        dialog.add(txtNombre);
+        dialog.add(new JLabel("Capacidad:"));
+        dialog.add(txtCapacidad);
+        dialog.add(new JLabel("Estado:"));
+        dialog.add(comboEstado);
+        
+        JButton btnGuardar = new javax.swing.JButton("Guardar");
+        btnGuardar.addActionListener(e -> {
+            try {
+                String query = "UPDATE laboratorio SET descripcion = ?, capacidad = ? WHERE idlaboratorio = ?";
+                PreparedStatement stmt = conexion.prepareStatement(query);
+                stmt.setString(1, txtNombre.getText());
+                stmt.setInt(2, Integer.parseInt(txtCapacidad.getText()));
+                stmt.setString(3, codigoLab);
+                
+                stmt.executeUpdate();
+                cargarDatosLaboratorios();
+                dialog.dispose();
+                JOptionPane.showMessageDialog(this, "Laboratorio actualizado exitosamente");
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(dialog, "Error al actualizar laboratorio: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(dialog, "La capacidad debe ser un número válido",
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        
+        JPanel panelBotones = new JPanel();
+        panelBotones.add(btnGuardar);
+        
+        dialog.add(new JLabel()); // Espacio vacío
+        dialog.add(panelBotones);
+        dialog.setVisible(true);
+    }
+
+    private void cambiarEstadoLaboratorio() {
+        int filaSeleccionada = tablaLaboratorios.getSelectedRow();
+        if (filaSeleccionada == -1) {
+            JOptionPane.showMessageDialog(this, "Seleccione un laboratorio", 
+                "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        String[] opciones = {"DISPONIBLE", "OCUPADO", "MANTENIMIENTO", "INACTIVO"};
+        String nuevoEstado = (String) JOptionPane.showInputDialog(
+            this,
+            "Seleccione el nuevo estado:",
+            "Cambiar Estado",
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            opciones,
+            opciones[0]
+        );
+        
+        if (nuevoEstado != null) {
+            // Actualizar solo el estado en la tabla (no hay columna de estado en la BD, es solo visual)
+            tablaLaboratorios.setValueAt(nuevoEstado, filaSeleccionada, 3);
+            JOptionPane.showMessageDialog(this, "Estado actualizado exitosamente");
+        }
+    }
+    
+    private void generarReporte() {
+        int tipoReporte = comboReportes.getSelectedIndex();
+        if (tipoReporte == 0) {
+            JOptionPane.showMessageDialog(this, "Seleccione un tipo de reporte", 
+                "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        try {
+            String query = "";
+            String titulo = "";
+            
+            switch(tipoReporte) {
+                case 1:
+                    query = "SELECT * FROM vistareporteuso";
+                    titulo = "Uso de laboratorios";
+                    break;
+                case 2:
+                    query = "SELECT d.nombre, COUNT(a.idagendamiento) as reservas " +
+                            "FROM agendamiento a JOIN docente d ON a.iddocente = d.idusuario " +
+                            "GROUP BY d.nombre";
+                    titulo = "Agendamientos por docente";
+                    break;
+                case 3:
+                    // Ejemplo para materiales (ajustar según tu esquema)
+                    query = "SELECT * FROM material WHERE fecha_caducidad BETWEEN CURRENT_DATE AND (CURRENT_DATE + INTERVAL '30 days')";
+                    titulo = "Materiales próximos a caducar";
+                    break;
+                case 4:
+                    query = "SELECT * FROM logagendamiento WHERE accion LIKE '%INCIDENCIA%'";
+                    titulo = "Incidencias reportadas";
+                    break;
+            }
+            
+            PreparedStatement stmt = conexion.prepareStatement(query);
+            ResultSet rs = stmt.executeQuery();
+            
+            // Crear tabla para mostrar resultados
+            JTable tablaReporte = new javax.swing.JTable(buildTableModel(rs));
+            JDialog reporteDialog = new JDialog(this, "Reporte: " + titulo, true);
+            reporteDialog.add(new JScrollPane(tablaReporte));
+            reporteDialog.setSize(600, 400);
+            reporteDialog.setLocationRelativeTo(this);
+            reporteDialog.setVisible(true);
+            
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this, "Error al generar reporte: " + ex.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    private DefaultTableModel buildTableModel(ResultSet rs) throws SQLException {
+        ResultSetMetaData metaData = rs.getMetaData();
+        
+        // Nombres de columnas
+        Vector<String> columnNames = new Vector<>();
+        int columnCount = metaData.getColumnCount();
+        for (int column = 1; column <= columnCount; column++) {
+            columnNames.add(metaData.getColumnName(column));
+        }
+        
+        // Datos
+        Vector<Vector<Object>> data = new Vector<>();
+        while (rs.next()) {
+            Vector<Object> vector = new Vector<>();
+            for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+                vector.add(rs.getObject(columnIndex));
+            }
+            data.add(vector);
+        }
+        
+        return new DefaultTableModel(data, columnNames);
+    }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgregarLab;
@@ -165,8 +646,12 @@ public class VistaAdmin extends javax.swing.JFrame {
     private javax.swing.JButton btnEditarLab;
     private javax.swing.JButton btnEditarUsuario;
     private javax.swing.JButton btnEliminarUsuario;
+    private javax.swing.JButton btnGenerarReporte;
+    private javax.swing.JComboBox<String> comboReportes;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTabbedPane jTabbedPane1;

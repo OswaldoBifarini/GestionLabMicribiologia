@@ -19,9 +19,9 @@ public class ControladorAsignatura {
     public ControladorAsignatura(com.mycompany.gestionlaboratoriomicrobiologia.dao.AsignaturaDAO asignaturaDAO) {
         this.asignaturaDAO = asignaturaDAO;
     }
-    private final AsignaturaDAO asignaturaDAO; //MARCA ERROR AQUI
+    private final AsignaturaDAO asignaturaDAO; 
     
-    public void crearAsignatura(Asignatura asignatura) { //MARCA ERROR AQUI
+    public void crearAsignatura(Asignatura asignatura) { 
         // Validar unicidad de código
         asignaturaDAO.insertar(asignatura);
         Auditoria.registrarEvento("Sistema", "CREAR_ASIGNATURA", asignatura.getCodigo()); //MARCA ERROR AQUI

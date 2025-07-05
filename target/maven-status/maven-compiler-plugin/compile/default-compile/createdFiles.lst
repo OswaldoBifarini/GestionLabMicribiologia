@@ -20,6 +20,7 @@ com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaLogin$3.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\persona\Docente.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\planificacion\PAO.class
 com\mycompany\gestionlaboratoriomicrobiologia\util\BCrypt.class
+com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaAdmin$1.class
 com\mycompany\gestionlaboratoriomicrobiologia\controlador\planificacion\ControladorAsignatura.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\persona\Rol.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\administracion\TipoReporte.class
