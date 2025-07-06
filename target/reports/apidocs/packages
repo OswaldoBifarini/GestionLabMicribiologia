@@ -1,0 +1,12 @@
+com.mycompany.gestionlaboratoriomicrobiologia.controlador
+com.mycompany.gestionlaboratoriomicrobiologia.controlador.planificacion
+com.mycompany.gestionlaboratoriomicrobiologia.controlador.seguridad
+com.mycompany.gestionlaboratoriomicrobiologia.dao
+com.mycompany.gestionlaboratoriomicrobiologia.excepciones
+com.mycompany.gestionlaboratoriomicrobiologia
+com.mycompany.gestionlaboratoriomicrobiologia.modelo.administracion
+com.mycompany.gestionlaboratoriomicrobiologia.modelo.kardex
+com.mycompany.gestionlaboratoriomicrobiologia.modelo.persona
+com.mycompany.gestionlaboratoriomicrobiologia.modelo.planificacion
+com.mycompany.gestionlaboratoriomicrobiologia.util
+com.mycompany.gestionlaboratoriomicrobiologia.vista

@@ -38,6 +38,8 @@
             <version>1.4</version>
         </dependency>
         
+        <!-- para podr acer las graficas estadisticas -->
+
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>
@@ -49,13 +51,7 @@
             <artifactId>flatlaf</artifactId>
             <version>3.4.1</version>
         </dependency>
-         <!-- para podr acer las graficas estadisticas -->
-        <dependency>
-            <groupId>org.jfree</groupId>
-            <artifactId>jfreechart</artifactId>
-            <version>1.5.3</version>
-        </dependency>
-
+       
     </dependencies>
 </project>
 
