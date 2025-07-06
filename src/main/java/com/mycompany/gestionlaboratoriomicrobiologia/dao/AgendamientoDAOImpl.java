@@ -4,21 +4,83 @@
  */
 package com.mycompany.gestionlaboratoriomicrobiologia.dao;
 
-
 import com.mycompany.gestionlaboratoriomicrobiologia.modelo.planificacion.Agendamiento;
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-
-/**
- *
- * @author DELL
- */
+import java.util.Map;
 
 public class AgendamientoDAOImpl implements AgendamientoDAO {
 
+    private final Connection conexion;
+
+    public AgendamientoDAOImpl(Connection conexion) {
+        this.conexion = conexion;
+    }
+
+    public static class Estadistica {
+        private LocalDate fecha;
+        private String asignatura;
+        private String practica;
+        private int total;
+
+        public Estadistica(LocalDate fecha, String asignatura, String practica, int total) {
+            this.fecha = fecha;
+            this.asignatura = asignatura;
+            this.practica = practica;
+            this.total = total;
+        }
+
+        public LocalDate getFecha() {
+            return fecha;
+        }
+
+        public String getAsignatura() {
+            return asignatura;
+        }
+
+        public String getPractica() {
+            return practica;
+        }
+
+        public int getTotal() {
+            return total;
+        }
+    }
+
+    public List<Estadistica> obtenerEstadisticasDetalladas() throws SQLException {
+        String sql = "SELECT ag.fecha AS fecha, "
+                   + "a.nombre AS asignatura, "
+                   + "p.descripcion AS practica, "  // Columna alternativa común
+                   + "COUNT(*) AS total "
+                   + "FROM agendamiento ag "
+                   + "JOIN practica p ON ag.idpractica = p.idpractica "
+                   + "JOIN clase c ON p.idclase = c.idclase "
+                   + "JOIN asignatura a ON c.idasignatura = a.idasignatura "
+                   + "GROUP BY ag.fecha, a.nombre, p.descripcion "  // Actualizado
+                   + "ORDER BY ag.fecha, a.nombre, p.descripcion";  // Actualizado
+
+        try (PreparedStatement st = conexion.prepareStatement(sql); 
+             ResultSet rs = st.executeQuery()) {
+            
+            List<Estadistica> lista = new ArrayList<>();
+            while (rs.next()) {
+                lista.add(new Estadistica(
+                    rs.getDate("fecha").toLocalDate(),
+                    rs.getString("asignatura"),
+                    rs.getString("practica"),
+                    rs.getInt("total")
+                ));
+            }
+            return lista;
+        }
+    }
+
+    // metodos
+    
     private static final String INSERT_SQL = "INSERT INTO agendamientos "
             + "(fecha_solicitud, fecha_uso, hora_inicio, hora_fin, tema, "
             + "nro_estudiantes, estado, docente_id, laboratorio_codigo, pao_id, asignatura_codigo) "
@@ -31,36 +93,29 @@ public class AgendamientoDAOImpl implements AgendamientoDAO {
 
     @Override
     public boolean existeConflictoHorario(LocalDate fecha, LocalTime inicio, LocalTime fin) {
-        try (Connection conn = ConexionDB.conectar();
-             PreparedStatement stmt = conn.prepareStatement(CONFLICT_SQL)) {
-            
+        try (PreparedStatement stmt = this.conexion.prepareStatement(CONFLICT_SQL)) {
             stmt.setDate(1, Date.valueOf(fecha));
             stmt.setTime(2, Time.valueOf(fin));
             stmt.setTime(3, Time.valueOf(inicio));
             stmt.setTime(4, Time.valueOf(fin));
             stmt.setTime(5, Time.valueOf(inicio));
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getInt(1) > 0;
-                }
+                return rs.next() && rs.getInt(1) > 0;
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error al verificar conflictos", e);
         }
-        return false;
     }
 
     @Override
     public void guardar(Agendamiento agendamiento) {
-        insertar(agendamiento); // Alias para insertar
+        insertar(agendamiento);
     }
 
     @Override
     public void insertar(Agendamiento agendamiento) {
-        try (Connection conn = ConexionDB.conectar();
-             PreparedStatement stmt = conn.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
-            
+        try (PreparedStatement stmt = this.conexion.prepareStatement(INSERT_SQL, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setDate(1, Date.valueOf(agendamiento.getFechaSolicitud()));
             stmt.setDate(2, Date.valueOf(agendamiento.getFechaUso()));
             stmt.setTime(3, Time.valueOf(agendamiento.getHoraInicio()));
@@ -72,9 +127,9 @@ public class AgendamientoDAOImpl implements AgendamientoDAO {
             stmt.setString(9, agendamiento.getLaboratorio().getCodigo());
             stmt.setInt(10, agendamiento.getPao().getId());
             stmt.setString(11, agendamiento.getAsignatura().getCodigo());
-            
+
             stmt.executeUpdate();
-            
+
             try (ResultSet rs = stmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     agendamiento.setId(rs.getInt(1));
@@ -85,23 +140,39 @@ public class AgendamientoDAOImpl implements AgendamientoDAO {
         }
     }
 
-    // Implementa los demás métodos según necesidad
+    @Override
+    public Map<String, Integer> conteoAgendamientosPorCurso() throws SQLException {
+        String sql = "SELECT a.nombre AS curso, COUNT(*) AS total "
+                   + "FROM agendamiento ag "
+                   + "JOIN practica p ON ag.idpractica = p.idpractica "
+                   + "JOIN clase c ON p.idclase = c.idclase "
+                   + "JOIN asignatura a ON c.idasignatura = a.idasignatura "
+                   + "GROUP BY a.nombre";
+        
+        try (PreparedStatement st = conexion.prepareStatement(sql); 
+             ResultSet rs = st.executeQuery()) {
+            
+            Map<String, Integer> mapa = new LinkedHashMap<>();
+            while (rs.next()) {
+                mapa.put(rs.getString("curso"), rs.getInt("total"));
+            }
+            return mapa;
+        }
+    }
+
     @Override
     public List<Agendamiento> obtenerPorFechaYLaboratorio(LocalDate fecha, String codigoLaboratorio) {
-        List<Agendamiento> agendamientos = new ArrayList<>();
-        // Implementa la consulta SQL
-        return agendamientos;
+        return new ArrayList<>();
     }
 
     @Override
     public void actualizar(Agendamiento entidad) {
-        // Implementación similar a insertar pero con UPDATE
+        //  pendiente de implementar
     }
 
     @Override
     public void eliminar(int id) {
-        try (Connection conn = ConexionDB.conectar();
-             PreparedStatement stmt = conn.prepareStatement("DELETE FROM agendamientos WHERE id = ?")) {
+        try (PreparedStatement stmt = this.conexion.prepareStatement("DELETE FROM agendamientos WHERE id = ?")) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {
@@ -111,13 +182,11 @@ public class AgendamientoDAOImpl implements AgendamientoDAO {
 
     @Override
     public Agendamiento obtenerPorId(int id) {
-        // Implementa la consulta SELECT por ID
         return null;
     }
 
     @Override
     public List<Agendamiento> obtenerTodos() {
-        // Implementa la consulta SELECT *
         return new ArrayList<>();
     }
 }

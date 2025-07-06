@@ -17,6 +17,7 @@ import static javax.swing.text.html.HTML.Tag.I;
 public class ControladorPlanificacion {
 
     private final AgendamientoDAO agendamientoDAO;
+    
 
     // Inyección de dependencias por constructor
     public ControladorPlanificacion(AgendamientoDAO agendamientoDAO) {

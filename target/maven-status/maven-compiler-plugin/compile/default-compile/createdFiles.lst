@@ -7,6 +7,7 @@ com\mycompany\gestionlaboratoriomicrobiologia\modelo\persona\Tecnico.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\kardex\TipoMaterial.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\planificacion\Asignatura.class
 com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaNotificacion.class
+com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaAdmin$2.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\planificacion\Carrera.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\administracion\Reporte.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\kardex\EstadoEquipo.class
@@ -62,5 +63,6 @@ com\mycompany\gestionlaboratoriomicrobiologia\controlador\seguridad\ControladorU
 com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaLogin$2.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\planificacion\Agendamiento.class
 com\mycompany\gestionlaboratoriomicrobiologia\util\PasswordUtil.class
+com\mycompany\gestionlaboratoriomicrobiologia\dao\AgendamientoDAOImpl$Estadistica.class
 com\mycompany\gestionlaboratoriomicrobiologia\dao\AgendamientoDAOImpl.class
 com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaUserStandard.class

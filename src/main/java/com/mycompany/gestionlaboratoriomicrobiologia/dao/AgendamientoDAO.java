@@ -5,9 +5,11 @@
 package com.mycompany.gestionlaboratoriomicrobiologia.dao;
 
 import com.mycompany.gestionlaboratoriomicrobiologia.modelo.planificacion.Agendamiento;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Map;
 
 public interface AgendamientoDAO {
     void guardar(Agendamiento agendamiento);
@@ -18,4 +20,13 @@ public interface AgendamientoDAO {
     void eliminar(int id);
     Agendamiento obtenerPorId(int id);
     List<Agendamiento> obtenerTodos();
+    /**  
+     * Devuelve un mapa <curso, número de agendamientos>  
+     * para usar en los reportes estadísticos.  
+     */
+    Map<String,Integer> conteoAgendamientosPorCurso() throws SQLException;
 }
+
+
+    
+
