@@ -1,19 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package com.mycompany.gestionlaboratoriomicrobiologia.vista;
 
-import com.mycompany.gestionlaboratoriomicrobiologia.dao.AgendamientoDAO;
 import com.mycompany.gestionlaboratoriomicrobiologia.dao.AgendamientoDAOImpl;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.category.DefaultCategoryDataset;
-import java.util.Map;
-
 import com.mycompany.gestionlaboratoriomicrobiologia.dao.ConexionDB;
-import com.mycompany.gestionlaboratoriomicrobiologia.modelo.planificacion.Agendamiento;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -36,21 +24,25 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.CategoryAxis;
 import org.jfree.chart.axis.CategoryLabelPositions;
 import org.jfree.chart.labels.StandardCategoryItemLabelGenerator;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.renderer.category.BarRenderer;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 public class VistaAdmin extends javax.swing.JFrame {
 
     private Connection conexion;
-    private AgendamientoDAOImpl controladorAgendamiento; // Cambiado a tipo concreto
+    private AgendamientoDAOImpl controladorAgendamiento;
 
     public VistaAdmin() {
         try {
             conexion = ConexionDB.conectar();
-            controladorAgendamiento = new AgendamientoDAOImpl(conexion); // Inicialización directa
+            controladorAgendamiento = new AgendamientoDAOImpl(conexion);
             initComponents();
             cargarDatosUsuarios();
             cargarDatosLaboratorios();
@@ -667,47 +659,62 @@ public class VistaAdmin extends javax.swing.JFrame {
     private void cargarGraficoEstadistico() {
         try {
             List<AgendamientoDAOImpl.Estadistica> datos = controladorAgendamiento.obtenerEstadisticasDetalladas();
+            
+            // Verificar si hay datos
+            if (datos == null || datos.isEmpty()) {
+                JOptionPane.showMessageDialog(this, 
+                    "No hay datos disponibles para generar el gráfico estadístico",
+                    "Información", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM");
-
+            
             for (AgendamientoDAOImpl.Estadistica e : datos) {
-                String serie = e.getAsignatura() + " – " + e.getPractica();
+                String serie = e.getAsignatura() + " - " + e.getPractica();
                 String fechaLabel = e.getFecha().format(fmt);
                 dataset.addValue(e.getTotal(), serie, fechaLabel);
             }
 
             JFreeChart chart = ChartFactory.createBarChart(
-                    "Uso de Laboratorios",
-                    "Fecha",
-                    "Cantidad de Agendamientos",
-                    dataset
+                "Uso de Laboratorios",
+                "Fecha",
+                "Cantidad de Agendamientos",
+                dataset
             );
 
             CategoryPlot plot = chart.getCategoryPlot();
             CategoryAxis domainAxis = plot.getDomainAxis();
-            domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
+            // Rotar etiquetas para mejor visualización
+            domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_90);
+            domainAxis.setLowerMargin(0.02);
+            domainAxis.setUpperMargin(0.02);
 
             BarRenderer renderer = (BarRenderer) plot.getRenderer();
             renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator());
             renderer.setDefaultItemLabelsVisible(true);
+            renderer.setItemMargin(0.1);  // Espacio entre barras
 
             ChartPanel chartPanel = new ChartPanel(chart);
-            chartPanel.setPreferredSize(new Dimension(700, 500));
-
+            chartPanel.setPreferredSize(new Dimension(750, 550));
+            
+            // Limpiar el panel y agregar el nuevo gráfico
             panelEstadistico.removeAll();
             panelEstadistico.setLayout(new BorderLayout());
             panelEstadistico.add(chartPanel, BorderLayout.CENTER);
-
+            
             panelEstadistico.revalidate();
             panelEstadistico.repaint();
-
+            
+            // Cambiar a la pestaña de estadísticas
             jTabbedPane4.setSelectedComponent(panelEstadistico);
 
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this,
-                    "Error al generar estadísticas: " + ex.getMessage(),
-                    "Error", JOptionPane.ERROR_MESSAGE);
+                "Error al generar estadísticas: " + ex.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
