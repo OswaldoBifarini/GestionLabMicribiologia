@@ -22,6 +22,7 @@ public class AgendamientoDAOImpl implements AgendamientoDAO {
     }
 
     public static class Estadistica {
+
         private LocalDate fecha;
         private String asignatura;
         private String practica;
@@ -51,7 +52,7 @@ public class AgendamientoDAOImpl implements AgendamientoDAO {
         }
     }
 
-    public List<Estadistica> obtenerEstadisticasDetalladas() throws SQLException {
+    /* public List<Estadistica> obtenerEstadisticasDetalladas() throws SQLException {
         String sql = "SELECT ag.fecha AS fecha, "
                    + "a.nombre AS asignatura, "
                    + "p.descripcion AS practica, "  // Columna alternativa común
@@ -77,10 +78,36 @@ public class AgendamientoDAOImpl implements AgendamientoDAO {
             }
             return lista;
         }
+    }*/
+    
+    /////////nueva implementacion de con correccion de columnas
+    public List<Estadistica> obtenerEstadisticasDetalladas() throws SQLException {
+        String sql = "SELECT ag.fecha AS fecha, "
+                + "COALESCE(a.nombre, 'SIN ASIGNATURA') AS asignatura, "
+                + "COALESCE(p.tema, 'SIN PRACTICA') AS practica, " // Cambiado a p.tema
+                + "COUNT(*) AS total "
+                + "FROM agendamiento ag "
+                + "LEFT JOIN practica p ON ag.idpractica = p.idpractica " // LEFT JOIN
+                + "LEFT JOIN clase c ON p.idclase = c.idclase "
+                + "LEFT JOIN asignatura a ON c.idasignatura = a.idasignatura "
+                + "GROUP BY ag.fecha, COALESCE(a.nombre, 'SIN ASIGNATURA'), COALESCE(p.tema, 'SIN PRACTICA')"
+                + "ORDER BY ag.fecha, COALESCE(a.nombre, 'SIN ASIGNATURA'), COALESCE(p.tema, 'SIN PRACTICA')";
+
+        try (PreparedStatement st = conexion.prepareStatement(sql); ResultSet rs = st.executeQuery()) {
+
+            List<Estadistica> lista = new ArrayList<>();
+            while (rs.next()) {
+                lista.add(new Estadistica(
+                        rs.getDate("fecha").toLocalDate(),
+                        rs.getString("asignatura"),
+                        rs.getString("practica"),
+                        rs.getInt("total")
+                ));
+            }
+            return lista;
+        }
     }
 
-    // metodos
-    
     private static final String INSERT_SQL = "INSERT INTO agendamientos "
             + "(fecha_solicitud, fecha_uso, hora_inicio, hora_fin, tema, "
             + "nro_estudiantes, estado, docente_id, laboratorio_codigo, pao_id, asignatura_codigo) "
@@ -143,15 +170,14 @@ public class AgendamientoDAOImpl implements AgendamientoDAO {
     @Override
     public Map<String, Integer> conteoAgendamientosPorCurso() throws SQLException {
         String sql = "SELECT a.nombre AS curso, COUNT(*) AS total "
-                   + "FROM agendamiento ag "
-                   + "JOIN practica p ON ag.idpractica = p.idpractica "
-                   + "JOIN clase c ON p.idclase = c.idclase "
-                   + "JOIN asignatura a ON c.idasignatura = a.idasignatura "
-                   + "GROUP BY a.nombre";
-        
-        try (PreparedStatement st = conexion.prepareStatement(sql); 
-             ResultSet rs = st.executeQuery()) {
-            
+                + "FROM agendamiento ag "
+                + "JOIN practica p ON ag.idpractica = p.idpractica "
+                + "JOIN clase c ON p.idclase = c.idclase "
+                + "JOIN asignatura a ON c.idasignatura = a.idasignatura "
+                + "GROUP BY a.nombre";
+
+        try (PreparedStatement st = conexion.prepareStatement(sql); ResultSet rs = st.executeQuery()) {
+
             Map<String, Integer> mapa = new LinkedHashMap<>();
             while (rs.next()) {
                 mapa.put(rs.getString("curso"), rs.getInt("total"));

@@ -670,7 +670,7 @@ public class VistaAdmin extends javax.swing.JFrame {
 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM");
-            
+
             for (AgendamientoDAOImpl.Estadistica e : datos) {
                 String serie = e.getAsignatura() + " – " + e.getPractica();
                 String fechaLabel = e.getFecha().format(fmt);
@@ -678,36 +678,36 @@ public class VistaAdmin extends javax.swing.JFrame {
             }
 
             JFreeChart chart = ChartFactory.createBarChart(
-                "Uso de Laboratorios",
-                "Fecha",
-                "Cantidad de Agendamientos",
-                dataset
+                    "Uso de Laboratorios",
+                    "Fecha",
+                    "Cantidad de Agendamientos",
+                    dataset
             );
 
             CategoryPlot plot = chart.getCategoryPlot();
             CategoryAxis domainAxis = plot.getDomainAxis();
             domainAxis.setCategoryLabelPositions(CategoryLabelPositions.UP_45);
-            
+
             BarRenderer renderer = (BarRenderer) plot.getRenderer();
             renderer.setDefaultItemLabelGenerator(new StandardCategoryItemLabelGenerator());
             renderer.setDefaultItemLabelsVisible(true);
 
             ChartPanel chartPanel = new ChartPanel(chart);
             chartPanel.setPreferredSize(new Dimension(700, 500));
-            
+
             panelEstadistico.removeAll();
             panelEstadistico.setLayout(new BorderLayout());
             panelEstadistico.add(chartPanel, BorderLayout.CENTER);
-            
+
             panelEstadistico.revalidate();
             panelEstadistico.repaint();
-            
+
             jTabbedPane4.setSelectedComponent(panelEstadistico);
 
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this,
-                "Error al generar estadísticas: " + ex.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error al generar estadísticas: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 
