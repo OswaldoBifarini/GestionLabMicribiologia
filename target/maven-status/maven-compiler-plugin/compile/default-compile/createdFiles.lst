@@ -38,7 +38,6 @@ com\mycompany\gestionlaboratoriomicrobiologia\excepciones\RelacionException.clas
 com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaLogin.class
 com\mycompany\gestionlaboratoriomicrobiologia\excepciones\BusinessException.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\kardex\TipoReactivo.class
-com\mycompany\gestionlaboratoriomicrobiologia\vista\VistaDocente$1.class
 com\mycompany\gestionlaboratoriomicrobiologia\controlador\seguridad\ControladorUsuario.class
 com\mycompany\gestionlaboratoriomicrobiologia\modelo\planificacion\EstadoAgendamiento.class
 com\mycompany\gestionlaboratoriomicrobiologia\dao\ConexionDB.class
