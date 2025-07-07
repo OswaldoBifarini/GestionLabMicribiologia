@@ -10,8 +10,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -198,7 +200,7 @@ public class VistaAdmin extends javax.swing.JFrame {
         jTabbedPane4.addTab("Reportes del Sistema", panelReportes);
 
         panelEstadistico.setLayout(new java.awt.BorderLayout());
-        jTabbedPane4.addTab("Estadisticas", panelEstadistico);
+        jTabbedPane4.addTab("Graficos", panelEstadistico);
 
         jTabbedPane1.addTab("Reportes", jTabbedPane4);
 
@@ -233,6 +235,7 @@ public class VistaAdmin extends javax.swing.JFrame {
         comboReportes.addItem("Materiales próximos a caducar");
         comboReportes.addItem("Incidencias reportadas");
         comboReportes.addItem("Reporte Estadístico");
+        comboReportes.addItem("Modelo Poblacional");
     }
 
     private void cargarDatosUsuarios() {
@@ -588,6 +591,7 @@ public class VistaAdmin extends javax.swing.JFrame {
         if (tipoReporte == 0) {
             JOptionPane.showMessageDialog(this, "Seleccione un tipo de reporte",
                     "Error", JOptionPane.WARNING_MESSAGE);
+
             return;
         }
 
@@ -616,6 +620,10 @@ public class VistaAdmin extends javax.swing.JFrame {
                     break;
                 case 5:
                     cargarGraficoEstadistico();
+                    return;
+
+                case 6:
+                    cargarGraficoPoblacional();
                     return;
             }
 
@@ -659,19 +667,19 @@ public class VistaAdmin extends javax.swing.JFrame {
     private void cargarGraficoEstadistico() {
         try {
             List<AgendamientoDAOImpl.Estadistica> datos = controladorAgendamiento.obtenerEstadisticasDetalladas();
-            
+
             // Verificar si hay datos
             if (datos == null || datos.isEmpty()) {
-                JOptionPane.showMessageDialog(this, 
-                    "No hay datos disponibles para generar el gráfico estadístico",
-                    "Información", 
-                    JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(this,
+                        "No hay datos disponibles para generar el gráfico estadístico",
+                        "Información",
+                        JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
 
             DefaultCategoryDataset dataset = new DefaultCategoryDataset();
             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM");
-            
+
             for (AgendamientoDAOImpl.Estadistica e : datos) {
                 String serie = e.getAsignatura() + " - " + e.getPractica();
                 String fechaLabel = e.getFecha().format(fmt);
@@ -679,10 +687,10 @@ public class VistaAdmin extends javax.swing.JFrame {
             }
 
             JFreeChart chart = ChartFactory.createBarChart(
-                "Uso de Laboratorios",
-                "Fecha",
-                "Cantidad de Agendamientos",
-                dataset
+                    "Uso de Laboratorios",
+                    "Fecha",
+                    "Cantidad de Agendamientos",
+                    dataset
             );
 
             CategoryPlot plot = chart.getCategoryPlot();
@@ -699,22 +707,75 @@ public class VistaAdmin extends javax.swing.JFrame {
 
             ChartPanel chartPanel = new ChartPanel(chart);
             chartPanel.setPreferredSize(new Dimension(750, 550));
-            
+
             // Limpiar el panel y agregar el nuevo gráfico
             panelEstadistico.removeAll();
             panelEstadistico.setLayout(new BorderLayout());
             panelEstadistico.add(chartPanel, BorderLayout.CENTER);
-            
+
             panelEstadistico.revalidate();
             panelEstadistico.repaint();
-            
+
             // Cambiar a la pestaña de estadísticas
             jTabbedPane4.setSelectedComponent(panelEstadistico);
 
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(this,
-                "Error al generar estadísticas: " + ex.getMessage(),
-                "Error", JOptionPane.ERROR_MESSAGE);
+                    "Error al generar estadísticas: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // PARA CARGAR LOS GRAFICOS DE CALCULO DEL MODELO POBLACIONAL
+    private void cargarGraficoPoblacional() {
+        try {
+            Map<LocalDate, Integer> datos = controladorAgendamiento.obtenerDatosPoblacionales();
+
+            if (datos.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "No hay datos para generar el modelo", "Información", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+
+            DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM");
+
+            // Agregar datos reales
+            datos.forEach((fecha, conteo) -> {
+                dataset.addValue(conteo, "Agendamientos Reales", fecha.format(fmt));
+            });
+
+            // Calcular modelo exponencial (ejemplo simplificado)
+            double p0 = datos.values().iterator().next(); // Población inicial
+            double r = 0.1; // Tasa de crecimiento (ajustable)
+
+            int t = 0;
+            for (LocalDate fecha : datos.keySet()) {
+                double modelo = p0 * Math.exp(r * t++);
+                dataset.addValue(modelo, "Modelo Poblacional", fecha.format(fmt));
+            }
+
+            JFreeChart chart = ChartFactory.createLineChart(
+                    "Modelo Poblacional de Agendamientos",
+                    "Fecha",
+                    "Cantidad de Agendamientos",
+                    dataset
+            );
+
+            ChartPanel chartPanel = new ChartPanel(chart);
+            chartPanel.setPreferredSize(new Dimension(750, 550));
+
+            panelEstadistico.removeAll();
+            panelEstadistico.setLayout(new BorderLayout());
+            panelEstadistico.add(chartPanel, BorderLayout.CENTER);
+            panelEstadistico.revalidate();
+            panelEstadistico.repaint();
+
+            jTabbedPane4.setSelectedComponent(panelEstadistico);
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Error al generar modelo: " + ex.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 

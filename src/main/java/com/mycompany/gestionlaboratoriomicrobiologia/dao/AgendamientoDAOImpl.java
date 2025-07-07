@@ -107,6 +107,21 @@ public class AgendamientoDAOImpl implements AgendamientoDAO {
             return lista;
         }
     }
+    public Map<LocalDate, Integer> obtenerDatosPoblacionales() throws SQLException {
+    String sql = "SELECT fecha_uso, COUNT(*) as conteo FROM agendamiento GROUP BY fecha_uso ORDER BY fecha_uso";
+    Map<LocalDate, Integer> datos = new LinkedHashMap<>();
+    
+    try (PreparedStatement st = conexion.prepareStatement(sql);
+         ResultSet rs = st.executeQuery()) {
+        while (rs.next()) {
+            datos.put(
+                rs.getDate("fecha_uso").toLocalDate(),
+                rs.getInt("conteo")
+            );
+        }
+    }
+    return datos;
+}
 
     private static final String INSERT_SQL = "INSERT INTO agendamientos "
             + "(fecha_solicitud, fecha_uso, hora_inicio, hora_fin, tema, "
